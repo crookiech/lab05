@@ -1,53 +1,63 @@
 #include "Dust.hpp"
 #include <cmath>
 
-Dust::Dust(Velocity velocity, Point center, double radius, Color color, double lifetime) 
-: velocity(velocity), center(center), radius(radius), color(color), lifetime(lifetime) {}
+/// @brief Конструктор с параметрами
+/// @param inputVelocity скорость частицы
+/// @param inputCenter центр частицы
+/// @param inputRadius радиус частицы
+/// @param inputColor цвет частицы
+/// @param inputLifetime время жизни частицы
+Dust::Dust(Velocity inputVelocity, Point inputCenter, double inputRadius, Color inputColor, double inputLifetime) 
+: DustVelocity(inputVelocity), DustCenter(inputCenter), DustRadius(inputRadius), DustColor(inputColor), lifetime(inputLifetime) {}
 
+/// @brief Обновление времени жизни частицы
+/// @param deltaTime время, прошедшее с последнего обновления состояния частицы (в секундах)
+void Dust::updateDust(double deltaTime) {
+    lifetime -= deltaTime; // время жизни частицы сокращается на количество времени, прошедшее с последнего обновления
+    if (lifetime <= 0) { // если частица умерла
+        isAlive = false; // устанавливаем флаг для удаления
+    }
+}
+
+/// @brief Выполняет отрисовку частицы
+/// @details объект Dust абстрагирован от способа отображения пикселей на экране, знаком с интерфейсом, который предоставляет Painter (выполняется путем вызова painter.draw(...))
+/// @param painter контекст отрисовки
+void Dust::drawDust(Painter& inputPainter) const {
+    inputPainter.draw(DustCenter, DustRadius, DustColor);
+}
+
+/// @brief Задает скорость частицы
+/// @param velocity значение скорости
+void Dust::setDustVelocity(const Velocity& inputVelocity) {
+    this->DustVelocity = inputVelocity;
+}
+
+/// @brief Задает координаты центра частицы
+/// @param center центр частицы
+void Dust::setDustCenter(const Point& inputCenter) {
+    this->DustCenter = inputCenter;
+}
+
+/// @brief Возваращает флаг отслеживания жизни частицы
+/// @return 
 bool Dust::getIsAlive() const {
     return isAlive;
 }
 
-void Dust::update(double deltaTime) {
-    lifetime -= deltaTime;
-    if (lifetime <= 0) {
-        isAlive = false; // Устанавливаем флаг для удаления
-    }
+/// @brief Возваращает скорость частицы
+/// @return скорость частицы
+Velocity Dust::getDustVelocity() const {
+    return DustVelocity;
 }
 
-/// @brief Задает скорость объекта
-/// @param velocity значение скорости
-void Dust::setVelocity(const Velocity& velocity) {
-    this->velocity = velocity;
+/// @brief Возвращает координаты центра частицы
+/// @return центр частицы
+Point Dust::getDustCenter() const {
+    return DustCenter;
 }
 
-/// @brief Возваращает скорость объекта
-/// @return скорость объекта
-Velocity Dust::getVelocity() const {
-    return velocity;
-}
-
-/// @brief Выполняет отрисовку объекта
-/// @details объект Dust абстрагирован от способа отображения пикселей на экране, знаком с интерфейсом, который предоставляет Painter (выполняется путем вызова painter.draw(...))
-/// @param painter контекст отрисовки
-void Dust::draw(Painter& painter) const {
-    painter.draw(center, radius, color);
-}
-
-/// @brief Задает координаты центра объекта
-/// @param center центр объекта
-void Dust::setCenter(const Point& center) {
-    this->center = center;
-}
-
-/// @brief Возвращает координаты центра объекта
-/// @return центр объекта
-Point Dust::getCenter() const {
-    return center;
-}
-
-/// @brief Возвращает радиус объекта
-/// @return радиус объекта
-double Dust::getRadius() const {
-    return radius;
+/// @brief Возвращает радиус частицы
+/// @return радиус частицы
+double Dust::getDustRadius() const {
+    return DustRadius;
 }

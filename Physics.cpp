@@ -1,112 +1,136 @@
 #include "Physics.h"
 
+/// @brief Функция вычисления скалярного произведения двух векторов
+/// @param lhs координаты первого вектора
+/// @param rhs координаты второго вектора
+/// @return скалярное произведение двух векторов
 double dot(const Point& lhs, const Point& rhs) {
     return lhs.x * rhs.x + lhs.y * rhs.y;
 }
 
-Physics::Physics(double timePerTick) : timePerTick{timePerTick} {}
+/// @brief Конструктор с параметрами
+/// @param inputTimePerTick время, которое проходит за один шаг моделирования
+Physics::Physics(double inputTimePerTick) : timePerTick{inputTimePerTick} {}
 
-void Physics::setWorldBox(const Point& topLeft, const Point& bottomRight) {
-    this->topLeft = topLeft;
-    this->bottomRight = bottomRight;
+/// @brief Функция, которая задает границы области моделирования
+/// @param inputTopLeft верхний левый угол границы 
+/// @param inputBottomRight нижний правый угол границы
+void Physics::setWorldBox(const Point& inputTopLeft, const Point& inputBottomRight) {
+    this->topLeft = inputTopLeft;
+    this->bottomRight = inputBottomRight;
 }
 
+/// @brief Функция перемещения мячей
+/// @param balls вектор мячей
+void Physics::moveBall(std::vector<Ball>& balls) const {
+    for (Ball& ball : balls) { // перебор всех мячей
+        Point newPos = ball.getBallCenter() + ball.getBallVelocity().vector() * timePerTick; // новая позиция = текущая координата + вектор скорости * timePerTick
+        ball.setBallCenter(newPos); // установление новой позиции мяча
+    }
+}
+
+/// @brief Функция перемещения живых частиц
+/// @param dusts вектор частиц
 void Physics::moveDust(std::vector<Dust>& dusts) const {
-    for (Dust& dust : dusts) {
-        if (dust.getIsAlive()) {
-            Point newPos = dust.getCenter() + dust.getVelocity().vector() * timePerTick;
-            dust.setCenter(newPos);
+    for (Dust& dust : dusts) { // перебор всех частиц
+        if (dust.getIsAlive()) { // если частица живая
+            Point newPos = dust.getDustCenter() + dust.getDustVelocity().vector() * timePerTick;
+            dust.setDustCenter(newPos); // установление новой позиции частицы
         }
     }
 }
 
-void Physics::update(std::vector<Ball>& balls, std::vector<Dust>& dusts, const size_t ticks) const {
+/// @brief Функция обновления состояний объектов
+/// @param balls вектор мячей
+/// @param dusts вектор частиц
+/// @param ticks 
+void Physics::physicsUpdate(std::vector<Ball>& balls, std::vector<Dust>& dusts, const size_t ticks) const {
     for (size_t i = 0; i < ticks; ++i) {
-        move(balls);
-        moveDust(dusts); // Добавляем движение частиц
-        collideWithBox(balls, dusts);
-        collideBalls(balls, dusts);
+        moveBall(balls); // обновление позиции мячей
+        moveDust(dusts); // обновление позиций частиц
+        collideWithBox(balls, dusts); // обработка столкновений мячей с границами области
+        collideBalls(balls, dusts); // обработка столкновений между мячами
     }
 }
 
+/// @brief Обработка столкновения между мячами
+/// @param balls вектор мячей
+/// @param dusts вектор частиц
 void Physics::collideBalls(std::vector<Ball>& balls, std::vector<Dust>& dusts) const {
+    // Перебор всех пар мячей (a и b - итераторы, которые указывают на элементы вектора balls)
     for (auto a = balls.begin(); a != balls.end(); ++a) {
         for (auto b = std::next(a); b != balls.end(); ++b) {
-            // Проверяем флаги isCollidable перед обработкой столкновения
-            if (!a->getIsCollidable() && !b->getIsCollidable()) {
-                continue; // Оба шара не сталкиваются
+            if (!a->getIsCollidable() && !b->getIsCollidable()) { // если оба мяча не сталкиваются
+                continue;
             }
-            const double distanceBetweenCenters2 = distance2(a->getCenter(), b->getCenter());
-            const double collisionDistance = a->getRadius() + b->getRadius();
-            const double collisionDistance2 = collisionDistance * collisionDistance;
-            if (distanceBetweenCenters2 < collisionDistance2) {
-                processCollision(*a, *b, distanceBetweenCenters2);
-                // Создание частиц при столкновении
+            const double distanceBetweenCenters2 = distance2(a->getBallCenter(), b->getBallCenter()); // квадрат расстояния между центрами шаров
+            const double collisionDistance = a->getBallRadius() + b->getBallRadius(); // сумма радиусов
+            const double collisionDistance2 = collisionDistance * collisionDistance;  // квадрат суммы радиусов
+            if (distanceBetweenCenters2 < collisionDistance2) { // если расстояние между центрами мячей меньше суммы радиусов
+                processCollision(*a, *b, distanceBetweenCenters2); // обработка столкновения мячей
+                // Создание частиц при столкновении мячей
                 for (int i = 0; i < 7; i++) {
-                    double angle = (i * 2 * M_PI / 7); // Разделяем угол на 7 частей
-                    Velocity particleVelocity(100 * i, angle); // Скорость больше, чем у шара
-                    Dust dust(particleVelocity, a->getCenter(), a->getRadius() / 5, Color(0, 1, 0), 0.15); // Установка скорости и времени жизни
-                    dusts.push_back(dust);
+                    double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
+                    Velocity dustVelocity(100 * i, angle); // скорость частицы (у 7 частиц разные скорости)
+                    Dust dust(dustVelocity, a->getBallCenter(), a->getBallRadius() / 5, Color(0, 1, 0), 0.15); // создание частицы зеленого цвета
+                    dusts.push_back(dust); // добавление частицы в вектор частиц
                 }
             }
         }
     }
 }
 
+/// @brief Обработка столкновения со стеной
+/// @param balls вектор мячей
+/// @param dusts вектор частиц
 void Physics::collideWithBox(std::vector<Ball>& balls, std::vector<Dust>& dusts) const {
-    for (Ball& ball : balls) {
-        const Point p = ball.getCenter();
-        const double r = ball.getRadius();
-        
-        // Определяем, находится ли шар за пределами границ
-        auto isOutOfRange = [](double v, double lo, double hi) {
-            return v < lo || v > hi;
+    for (Ball& ball : balls) { // перебор всех мячей
+        const Point p = ball.getBallCenter(); //координаты центра мяча
+        const double r = ball.getBallRadius(); // радиус мяча
+        // Лямбда функция - определяет, находится ли мяч за пределами границ
+        auto isOutOfRange = [](double centerCoordinate, double topLeftCoordinate, double bottomRightCoordinate) {
+            return centerCoordinate < topLeftCoordinate || centerCoordinate > bottomRightCoordinate;
         };
-        if (isOutOfRange(p.x, topLeft.x + r, bottomRight.x - r)) {
-            Point vector = ball.getVelocity().vector();
-            vector.x = -vector.x;
-            ball.setVelocity(vector);
-
+        if (isOutOfRange(p.x, topLeft.x + r, bottomRight.x - r)) { // если координата x центра мяча вышла за пределы границ world box по горизонтали (с учетом радиуса мяча)
+            Point vector = ball.getBallVelocity().vector(); // вектор скорости мяча
+            vector.x = -vector.x; // меняем направление скорости мяча по оси x
+            ball.setBallVelocity(vector); // устанавливаем новую скорость мяча
             // Создание частиц при столкновении со стеной
-            for (int i = 0; i < 5; i++) {
-                double angle = (i * 2 * M_PI / 5); // Разделяем угол на 5 частей
-                Velocity particleVelocity(800, angle); // Скорость больше, чем у шара
-                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // Установка скорости и времени жизни
-                dusts.push_back(dust);
+            for (int i = 0; i < 7; i++) {
+                double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
+                Velocity particleVelocity(100 * i, angle); // скорость частицы
+                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
+                dusts.push_back(dust); // добавление частицы в вектор частиц
             }
-        } else if (isOutOfRange(p.y, topLeft.y + r, bottomRight.y - r)) {
-            Point vector = ball.getVelocity().vector();
-            vector.y = -vector.y;
-            ball.setVelocity(vector);
-
+        } else if (isOutOfRange(p.y, topLeft.y + r, bottomRight.y - r)) { // если координата y центра мяча вышла за пределы границ world box по вертикали (с учетом радиуса мяча)
+            Point vector = ball.getBallVelocity().vector(); // вектор скорости мяча
+            vector.y = -vector.y; // меняем направление скорости мяча по оси y
+            ball.setBallVelocity(vector); // устанавливаем новую скорость мяча
             // Создание частиц при столкновении со стеной
-            for (int i = 0; i < 5; i++) {
-                double angle = (i * 2 * M_PI / 5); // Разделяем угол на 5 частей
-                Velocity particleVelocity(800, angle); // Скорость больше, чем у шара
-                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // Установка скорости и времени жизни
-                dusts.push_back(dust);
+            for (int i = 0; i < 7; i++) {
+                double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
+                Velocity particleVelocity(100 * i, angle); // скорость частицы
+                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
+                dusts.push_back(dust); // добавление частицы в вектор частиц
             }
         }
     }
 }
 
-void Physics::move(std::vector<Ball>& balls) const {
-    for (Ball& ball : balls) {
-        Point newPos =
-            ball.getCenter() + ball.getVelocity().vector() * timePerTick;
-        ball.setCenter(newPos);
-    }
-}
 
+
+/// @brief Процесс столкновения мячей
+/// @param a ссылка на первый мяч
+/// @param b ссылка на второй мяч
+/// @param distanceBetweenCenters2 квадрат расстояния между центрами шаров
 void Physics::processCollision(Ball& a, Ball& b, double distanceBetweenCenters2) const {
-    // нормированный вектор столкновения
-    const Point normal = (b.getCenter() - a.getCenter()) / std::sqrt(distanceBetweenCenters2);
-    // получаем скорость в векторном виде
-    const Point aV = a.getVelocity().vector();
-    const Point bV = b.getVelocity().vector();
+    const Point normal = (b.getBallCenter() - a.getBallCenter()) / std::sqrt(distanceBetweenCenters2); // нормированный вектор столкновения
+    // получение скорости в векторном виде
+    const Point aV = a.getBallVelocity().vector();
+    const Point bV = b.getBallVelocity().vector();
     // коэффициент p учитывает скорость обоих мячей
-    const double p = 2 * (dot(aV, normal) - dot(bV, normal)) / (a.getMass() + b.getMass());
+    const double p = 2 * (dot(aV, normal) - dot(bV, normal)) / (a.getBallMass() + b.getBallMass());
     // задаем новые скорости мячей после столкновения
-    a.setVelocity(Velocity(aV - normal * p * a.getMass()));
-    b.setVelocity(Velocity(bV + normal * p * b.getMass()));
+    a.setBallVelocity(Velocity(aV - normal * p * a.getBallMass()));
+    b.setBallVelocity(Velocity(bV + normal * p * b.getBallMass()));
 }

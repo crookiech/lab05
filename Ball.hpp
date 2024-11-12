@@ -4,22 +4,23 @@
 #include "Velocity.h"
 #include "Painter.h"
 
+/// @brief Класс мяча
 class Ball {
 public:
-    Ball(Velocity velocity, Point center, double radius, Color color, bool isCollidableOrNot);
+    Ball(Velocity inputVelocity, Point inputCenter, double inputRadius, Color inputColor, bool isCollidableOrNot);
     bool getIsCollidable() const;
-    void setVelocity(const Velocity& velocity);
-    Velocity getVelocity() const;
-    void draw(Painter& painter) const;
-    void setCenter(const Point& center);
-    Point getCenter() const;
-    double getRadius() const;
-    double getMass() const;
+    void setBallVelocity(const Velocity& inputVelocity);
+    Velocity getBallVelocity() const;
+    void drawBall(Painter& painter) const;
+    void setBallCenter(const Point& inputCenter);
+    Point getBallCenter() const;
+    double getBallRadius() const;
+    double getBallMass() const;
 
 private:
-    Velocity velocity;
-    Point center;
-    double radius;
-    Color color;
-    bool isCollidable; // Новое поле
+    Velocity BallVelocity; // скорость мяча
+    Point BallCenter; // центр мяча
+    double BallRadius; // радиус мяча
+    Color BallColor; // цвет мяча
+    bool isCollidable; // флаг о возможности мяча проходить сквозь другие объекты
 };

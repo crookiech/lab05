@@ -1,52 +1,60 @@
 #include "Ball.hpp"
 #include <cmath>
 
-Ball::Ball(Velocity velocity, Point center, double radius, Color color, bool isCollidableOrNot)
-    : velocity(velocity), center(center), radius(radius), color(color), isCollidable(isCollidableOrNot) {}
+/// @brief Конструктор с параметрами
+/// @param inputVelocity скорость мяча
+/// @param inputCenter центр мяча
+/// @param inputRadius радиус мяча
+/// @param inputColor цвет мяча
+/// @param isCollidableOrNot флаг о возможности мяча проходить сквозь другие объекты
+Ball::Ball(Velocity inputVelocity, Point inputCenter, double inputRadius, Color inputColor, bool isCollidableOrNot)
+    : BallVelocity(inputVelocity), BallCenter(inputCenter), BallRadius(inputRadius), BallColor(inputColor), isCollidable(isCollidableOrNot) {}
 
-bool Ball::getIsCollidable() const {
-    return isCollidable; // Возвращаем значение поля
-}
-
-/// @brief Задает скорость объекта
-/// @param velocity значение скорости
-void Ball::setVelocity(const Velocity& velocity) {
-    this->velocity = velocity;
-}
-
-/// @brief Возваращает скорость объекта
-/// @return скорость объекта
-Velocity Ball::getVelocity() const {
-    return velocity;
-}
-
-/// @brief Выполняет отрисовку объекта
+/// @brief Выполняет отрисовку мяча
 /// @details объект Ball абстрагирован от способа отображения пикселей на экране, знаком с интерфейсом, который предоставляет Painter (выполняется путем вызова painter.draw(...))
 /// @param painter контекст отрисовки
-void Ball::draw(Painter& painter) const { // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    painter.draw(center, radius, color);
+void Ball::drawBall(Painter& inputPainter) const {
+    inputPainter.draw(BallCenter, BallRadius, BallColor);
 }
 
-/// @brief Задает координаты центра объекта
-/// @param center центр объекта
-void Ball::setCenter(const Point& center) {
-    this->center = center;
+/// @brief Задает координаты центра мяча
+/// @param center центр мяча
+void Ball::setBallCenter(const Point& inputCenter) {
+    this->BallCenter = inputCenter;
 }
 
-/// @brief Возвращает координаты центра объекта
-/// @return центр объекта
-Point Ball::getCenter() const {
-    return center;
+/// @brief Задает скорость мяча
+/// @param velocity значение скорости
+void Ball::setBallVelocity(const Velocity& inputVelocity) {
+    this->BallVelocity = inputVelocity;
 }
 
-/// @brief Возвращает радиус объекта
-/// @return радиус объекта
-double Ball::getRadius() const {
-    return radius;
+/// @brief Возвращает флаг о возможности мяча проходить сквозь другие объекты
+/// @return флаг о возможности мяча проходить сквозь другие объекты
+bool Ball::getIsCollidable() const {
+    return isCollidable;
 }
 
-/// @brief Возвращает массу объекта
-/// @return масса объекта
-double Ball::getMass() const {
-    return M_PI * pow(radius, 3) * 4. / 3.; // заданная формула
+/// @brief Возвращает координаты центра мяча
+/// @return центр мяча
+Point Ball::getBallCenter() const {
+    return BallCenter;
+}
+
+/// @brief Возвращает радиус мяча
+/// @return радиус мяча
+double Ball::getBallRadius() const {
+    return BallRadius;
+}
+
+/// @brief Возвращает массу мяча
+/// @return масса мяча
+double Ball::getBallMass() const {
+    return M_PI * pow(BallRadius, 3) * 4. / 3.; // заданная формула
+}
+
+/// @brief Возваращает скорость мяча
+/// @return скорость мяча
+Velocity Ball::getBallVelocity() const {
+    return BallVelocity;
 }

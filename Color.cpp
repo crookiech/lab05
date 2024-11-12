@@ -1,18 +1,29 @@
 #include "Color.h"
 
+/// @brief Конструктор по умолчанию
+// инициализирует члены класса значениями нулями
 Color::Color() = default;
 
-Color::Color(double red, double green, double blue)
-    : r{red}, g{green}, b{blue} {}
+/// @brief Конструктор с параметрами
+/// @param red красная компонента цвета
+/// @param green зеленая компонента цвета
+/// @param blue синяя компонента цвета
+Color::Color(double inputRed, double inputGreen, double inputBlue) : r{inputRed}, g{inputGreen}, b{inputBlue} {}
 
-double Color::red() const {
+/// @brief Возвращает значение красного компонента цвета
+/// @return значение красной компоненты цвета
+double Color::getRed() const {
     return r;
 }
 
-double Color::green() const {
+/// @brief Возвращает значение зеленого компонента цвета
+/// @return значение зеленой компоненты цвета
+double Color::getGreen() const {
     return g;
 }
 
-double Color::blue() const {
+/// @brief Возвращает значение синего компонента цвета
+/// @return значение синей компоненты цвета
+double Color::getBlue() const {
     return b;
 }

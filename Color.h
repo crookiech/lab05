@@ -1,15 +1,15 @@
 #pragma once
 
+/// @brief Класс цвета
 class Color {
-  public:
+private:
+    double r{}; // красная компонента цвета
+    double g{}; // зеленая компонента цвета
+    double b{}; // синяя компонента цвета
+public:
     Color();
-    Color(double red, double green, double blue);
-    double red() const;
-    double green() const;
-    double blue() const;
-
-  private:
-    double r{};
-    double g{};
-    double b{};
+    Color(double inputRed, double inputGreen, double inputBlue);
+    double getRed() const;
+    double getGreen() const;
+    double getBlue() const;
 };

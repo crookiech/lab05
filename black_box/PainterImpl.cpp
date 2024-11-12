@@ -45,9 +45,9 @@ sf::Color PainterImpl::toSFMLColor(const Color& color) const {
     };
 
     return sf::Color{
-        toColorComponent(color.red()),
-        toColorComponent(color.green()),
-        toColorComponent(color.blue()),
+        toColorComponent(color.getRed()),
+        toColorComponent(color.getGreen()),
+        toColorComponent(color.getBlue()),
     };
 }
 
