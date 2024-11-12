@@ -26,10 +26,17 @@ jobs:
           config: Release
       
       # Настройка CMake
-      - run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR=${{ steps.sfml.outputs.path }}
-      - run: cmake --build .
-      - run: cmake --build . --target package
+      - name: Configure CMake
+        run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR=${{ steps.sfml.outputs.path }}
       
+      # Сборка проекта
+      - name: Build project
+        run: cmake --build .
+
+      # Проверка наличия файлов после сборки
+      - name: List files after build (windows)
+        run: dir
+
       # Создание релиза и загрузка артефактов
       - name: Create Release (windows)
         id: create_release_windows
@@ -49,7 +56,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
-          asset_path: ./physics-0.0.${{ github.run_number }}-win64.zip
+          asset_path: ./physics-0.0.${{ github.run_number }}-win64.zip  # Убедитесь, что этот путь правильный
           asset_name: physics-0.0.${{ github.run_number }}-win64.zip
           asset_content_type: application/zip
   
@@ -69,10 +76,17 @@ jobs:
         run: sudo apt-get install libsfml-dev
       
       # Настройка CMake для Ubuntu
-      - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
-      - run: cmake --build .
-      - run: cmake --build . --target package
-      
+      - name: Configure CMake (ubuntu)
+        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+
+      # Сборка проекта на Ubuntu
+      - name: Build project (ubuntu)
+        run: cmake --build .
+
+      # Проверка наличия файлов после сборки на Ubuntu
+      - name: List files after build (ubuntu)
+        run: ls -la
+
       # Создание релиза и загрузка артефактов для Ubuntu
       - name: Create Release (ubuntu)
         id: create_release_ubuntu
@@ -92,6 +106,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_ubuntu.outputs.upload_url }}
-          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip
+          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный
           asset_name: physics-0.0.${{ github.run_number }}-Linux.zip
           asset_content_type: application/zip
