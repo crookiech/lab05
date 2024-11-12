@@ -18,7 +18,6 @@ else ()
     set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    # Обход потенциальных проблем при сборке sfml-graphics
     set(WARNINGS_AS_ERRORS FALSE CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(SFML)
 endif ()
@@ -46,6 +45,14 @@ target_compile_options(physics PRIVATE
 install(TARGETS physics DESTINATION bin)
 
 # Включение CPack для создания пакетов
+include(CPack)
+
+# Настройка CPack для создания ZIP-файла
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "physics")
+set(CPACK_PACKAGE_VERSION "0.0.${PATCH_VERSION}")
+set(CPACK_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/packaging")  # Папка для выходных файлов
+
 include(CPack)
 
 # cmake_minimum_required(VERSION 3.7.2)
