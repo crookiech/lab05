@@ -8,6 +8,10 @@ on:
 jobs:
   build_windows:
     runs-on: windows-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -51,6 +55,10 @@ jobs:
   
   build_ubuntu:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
