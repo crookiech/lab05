@@ -1,7 +1,7 @@
 #include "Color.h"
+#include <fstream>
 
 /// @brief Конструктор по умолчанию
-// инициализирует члены класса значениями нулями
 Color::Color() = default;
 
 /// @brief Конструктор с параметрами

@@ -7,6 +7,9 @@
 /// @brief Класс мяча
 class Ball {
 public:
+
+    bool isInsideWorld; // Флаг для отслеживания положения мяча
+
     Ball(Velocity inputVelocity, Point inputCenter, double inputRadius, Color inputColor, bool isCollidableOrNot);
     bool getIsCollidable() const;
     void setBallVelocity(const Velocity& inputVelocity);

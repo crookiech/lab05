@@ -2,6 +2,7 @@
 #include "Painter.h"
 #include <fstream>
 #include "algorithm"
+#include <iostream>
 
 // Изменять не следует
 static constexpr double timePerTick = 0.001; // время одного тика в секундах
@@ -64,10 +65,21 @@ void World::show(Painter& painter) const {
 /// @brief Обновление состояния мира
 /// @param time 
 void World::worldUpdate(double time) {
-    time += restTime; // restTime - остаток времени от предыдущего тика
-    const auto ticks = static_cast<size_t>(std::floor(time / timePerTick)); // количество тиков, прошедших за заданное время time с учетом timePerTick
-    restTime = time - double(ticks) * timePerTick; // обновление restTime, хранящий остаток времени после вычисления тиков
-    physics.physicsUpdate(balls, dusts, ticks); // обновление физики для мячей и частиц
+    time += restTime;
+    const auto ticks = static_cast<size_t>(std::floor(time / timePerTick));
+    restTime = time - double(ticks) * timePerTick;
+    for (auto& ball : balls) {
+        const Point p = ball.getBallCenter();
+        const double r = ball.getBallRadius();
+        // Проверка на нахождение мяча в пределах границ мира
+        if (p.x >= topLeft.x + r && p.x <= bottomRight.x - r &&
+            p.y >= topLeft.y + r && p.y <= bottomRight.y - r) {
+            ball.isInsideWorld = true; // Мяч внутри границ
+        } else {
+            ball.isInsideWorld = false; // Мяч вне границ
+        }
+    }
+    physics.physicsUpdate(balls, dusts, ticks);
     // Обновление состояния частиц
     for (auto& dust : dusts) {
         dust.updateDust(timePerTick); // передача времени для обновления частиц

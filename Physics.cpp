@@ -1,4 +1,5 @@
 #include "Physics.h"
+#include <iostream>
 
 /// @brief Функция вычисления скалярного произведения двух векторов
 /// @param lhs координаты первого вектора
@@ -57,12 +58,11 @@ void Physics::physicsUpdate(std::vector<Ball>& balls, std::vector<Dust>& dusts, 
 /// @param balls вектор мячей
 /// @param dusts вектор частиц
 void Physics::collideBalls(std::vector<Ball>& balls, std::vector<Dust>& dusts) const {
-    // Перебор всех пар мячей (a и b - итераторы, которые указывают на элементы вектора balls)
     for (auto a = balls.begin(); a != balls.end(); ++a) {
+        if (!a->isInsideWorld) continue; // Игнорируем мяч вне границ
         for (auto b = std::next(a); b != balls.end(); ++b) {
-            if (!a->getIsCollidable() && !b->getIsCollidable()) { // если оба мяча не сталкиваются
-                continue;
-            }
+            if (!b->isInsideWorld) continue; // Игнорируем мяч вне границ
+            if (!a->getIsCollidable() && !b->getIsCollidable()) {continue;}
             const double distanceBetweenCenters2 = distance2(a->getBallCenter(), b->getBallCenter()); // квадрат расстояния между центрами шаров
             const double collisionDistance = a->getBallRadius() + b->getBallRadius(); // сумма радиусов
             const double collisionDistance2 = collisionDistance * collisionDistance;  // квадрат суммы радиусов
@@ -86,6 +86,7 @@ void Physics::collideBalls(std::vector<Ball>& balls, std::vector<Dust>& dusts) c
 /// @param dusts вектор частиц
 void Physics::collideWithBox(std::vector<Ball>& balls, std::vector<Dust>& dusts) const {
     for (Ball& ball : balls) { // перебор всех мячей
+        if (!ball.isInsideWorld) continue;
         const Point p = ball.getBallCenter(); //координаты центра мяча
         const double r = ball.getBallRadius(); // радиус мяча
         // Лямбда функция - определяет, находится ли мяч за пределами границ
@@ -119,8 +120,6 @@ void Physics::collideWithBox(std::vector<Ball>& balls, std::vector<Dust>& dusts)
         }
     }
 }
-
-
 
 /// @brief Процесс столкновения мячей
 /// @param a ссылка на первый мяч

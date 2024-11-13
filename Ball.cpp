@@ -8,7 +8,11 @@
 /// @param inputColor цвет мяча
 /// @param isCollidableOrNot флаг о возможности мяча проходить сквозь другие объекты
 Ball::Ball(Velocity inputVelocity, Point inputCenter, double inputRadius, Color inputColor, bool isCollidableOrNot)
-    : BallVelocity(inputVelocity), BallCenter(inputCenter), BallRadius(inputRadius), BallColor(inputColor), isCollidable(isCollidableOrNot) {}
+    : BallVelocity(inputVelocity), BallCenter(inputCenter), BallRadius(inputRadius), BallColor(inputColor), isCollidable(isCollidableOrNot) {
+
+        isInsideWorld = false;
+
+    }
 
 /// @brief Выполняет отрисовку мяча
 /// @details объект Ball абстрагирован от способа отображения пикселей на экране, знаком с интерфейсом, который предоставляет Painter (выполняется путем вызова painter.draw(...))
