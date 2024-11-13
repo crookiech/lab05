@@ -72,7 +72,8 @@ void Physics::collideBalls(std::vector<Ball>& balls, std::vector<Dust>& dusts) c
                 for (int i = 0; i < 7; i++) {
                     double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
                     Velocity dustVelocity(100 * i, angle); // скорость частицы (у 7 частиц разные скорости)
-                    Dust dust(dustVelocity, a->getBallCenter(), a->getBallRadius() / 5, Color(0, 1, 0), 0.15); // создание частицы зеленого цвета
+                    Dust dust(dustVelocity, a->getBallCenter(), 10, Color(0, 1, 0), 0.15);
+                    // Dust dust(dustVelocity, a->getBallCenter(), a->getBallRadius() / 5, Color(0, 1, 0), 0.15); // создание частицы зеленого цвета
                     dusts.push_back(dust); // добавление частицы в вектор частиц
                 }
             }
@@ -99,7 +100,8 @@ void Physics::collideWithBox(std::vector<Ball>& balls, std::vector<Dust>& dusts)
             for (int i = 0; i < 7; i++) {
                 double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
                 Velocity particleVelocity(100 * i, angle); // скорость частицы
-                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
+                Dust dust(particleVelocity, p, 10, Color(1, 0, 0), 0.15);
+                // Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
                 dusts.push_back(dust); // добавление частицы в вектор частиц
             }
         } else if (isOutOfRange(p.y, topLeft.y + r, bottomRight.y - r)) { // если координата y центра мяча вышла за пределы границ world box по вертикали (с учетом радиуса мяча)
@@ -110,7 +112,8 @@ void Physics::collideWithBox(std::vector<Ball>& balls, std::vector<Dust>& dusts)
             for (int i = 0; i < 7; i++) {
                 double angle = (i * 2 * M_PI / 7); // разделяем угол на 7 частей
                 Velocity particleVelocity(100 * i, angle); // скорость частицы
-                Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
+                Dust dust(particleVelocity, p, 10, Color(1, 0, 0), 0.15);
+                // Dust dust(particleVelocity, p, r / 5, Color(1, 0, 0), 0.15); // создание частицы красного цвета
                 dusts.push_back(dust); // добавление частицы в вектор частиц
             }
         }
