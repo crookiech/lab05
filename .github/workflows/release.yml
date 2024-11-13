@@ -24,7 +24,7 @@ jobs:
       
       # Настройка CMake
       - name: Configure CMake
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR=${{ steps.sfml.outputs.path }}
+        run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR="${{ steps.sfml.outputs.path }}"
       
       # Сборка проекта
       - name: Build project
@@ -33,6 +33,20 @@ jobs:
       # Проверка наличия файлов после сборки
       - name: List files after build (windows)
         run: dir
+
+      # Создание пакета
+      - name: Create package (windows)
+        run: cmake --build . --target package
+
+      # Проверка наличия zip-файла перед загрузкой
+      - name: Check for package file (windows)
+        run: |
+          if exist ./physics-0.0.${{ github.run_number }}-win64.zip (
+            echo Package exists.
+          ) else (
+            echo Package does not exist.
+            exit 1
+          )
 
       # Создание релиза и загрузка артефактов
       - name: Create Release (windows)
@@ -80,6 +94,20 @@ jobs:
       # Проверка наличия файлов после сборки на Ubuntu
       - name: List files after build (ubuntu)
         run: ls -la
+
+      # Создание пакета для Ubuntu
+      - name: Create package (ubuntu)
+        run: cmake --build . --target package
+
+      # Проверка наличия zip-файла перед загрузкой на Ubuntu
+      - name: Check for package file (ubuntu)
+        run: |
+          if [ -f ./physics-0.0.${{ github.run_number }}-Linux.zip ]; then
+            echo "Package exists."
+          else
+            echo "Package does not exist."
+            exit 1
+          fi
 
       # Создание релиза и загрузка артефактов для Ubuntu
       - name: Create Release (ubuntu)
