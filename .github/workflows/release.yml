@@ -38,11 +38,20 @@ jobs:
       - name: Create package (windows)
         run: cmake --build . --target package
 
-      # Удаление существующего zip-архива (если есть) и создание нового
+      # Проверка наличия папки bin и создание zip-архива с исполняемым файлом и DLL
       - name: Create ZIP archive (windows)
         run: |
-          powershell -Command "if (Test-Path './physics-0.0.${{ github.run_number }}-win64.zip') { Remove-Item './physics-0.0.${{ github.run_number }}-win64.zip' }"
-          powershell -Command "Compress-Archive -Path './bin/*' -DestinationPath './physics-0.0.${{ github.run_number }}-win64.zip'"
+          if (Test-Path './bin') {
+            if (Get-ChildItem './bin/*' -ErrorAction SilentlyContinue) {
+              powershell -Command "Compress-Archive -Path './bin/*' -DestinationPath './physics-0.0.${{ github.run_number }}-win64.zip'"
+            } else {
+              Write-Host "No files found in the bin directory."
+              exit 1
+            }
+          } else {
+            Write-Host "The bin directory does not exist."
+            exit 1
+          }
 
       # Создание релиза и загрузка артефактов
       - name: Create Release (windows)
@@ -116,4 +125,4 @@ jobs:
           upload_url: ${{ steps.create_release_ubuntu.outputs.upload_url }}
           asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный 
           asset_name: physics-0.0.${{ github.run_number }}-Linux.zip 
-          asset_content_type: application/zip 
+          asset_content_type: application/zip
