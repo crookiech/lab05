@@ -37,13 +37,15 @@ jobs:
       # Копирование необходимых DLL-файлов в выходной каталог
       - name: Copy DLLs to build directory
         run: |
-          set DLL_DIR=sources  # Папка, где находятся ваши DLL-файлы
-          if exist "${DLL_DIR}\*.dll" (
-            copy "${DLL_DIR}\*.dll" ".\"
-          ) else (
-            echo "No DLL files found in ${DLL_DIR}."
+          $DLL_DIR = "sources"  # Папка, где находятся ваши DLL-файлы
+          $dllFiles = Get-ChildItem "$DLL_DIR\*.dll"
+          if ($dllFiles) {
+            Copy-Item "$DLL_DIR\*.dll" ".\" -Force
+            Write-Host "DLL files copied successfully."
+          } else {
+            Write-Host "No DLL files found in $DLL_DIR."
             exit 1
-          )
+          }
 
       # Создание пакета (если необходимо)
       - name: Create package (windows)
