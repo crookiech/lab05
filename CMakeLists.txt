@@ -37,10 +37,10 @@ add_executable(physics
 
 target_link_libraries(physics PRIVATE sfml-graphics)
 
-# Укажите директорию, где находятся ваши DLL-файлы
+# Директория, где находятся dll-файлы
 set(DLL_DIR "${CMAKE_SOURCE_DIR}/sources")
 
-# Список необходимых DLL-файлов
+# Список необходимых dll-файлов
 set(DLL_FILES
     "${DLL_DIR}/sfml-audio-2.dll"
     "${DLL_DIR}/sfml-graphics-2.dll"
@@ -49,7 +49,7 @@ set(DLL_FILES
     "${DLL_DIR}/sfml-window-2.dll"
 )
 
-# Копирование DLL-файлов в выходной каталог после сборки
+# Копирование dll-файлов в выходной каталог после сборки
 foreach(DLL_FILE ${DLL_FILES})
     add_custom_command(TARGET physics POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -68,6 +68,8 @@ target_compile_options(physics PRIVATE
 )
 
 install(TARGETS physics DESTINATION bin)
+
+# Настройки для CPack
 set(CPACK_GENERATOR "ZIP;DEB")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_NAME "physics")

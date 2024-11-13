@@ -19,12 +19,12 @@ jobs:
         id: sfml
         uses: oprypin/install-sfml@v1
         with:
-          sfml: 2.6.1  # Укажите нужную версию SFML
+          sfml: 2.6.1  # версия SFML
           config: Release
       
       # Настройка CMake
       - name: Configure CMake
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR="${{ steps.sfml.outputs.path }}"
+        run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DSFML_DIR="${{ steps.sfml.outputs.path }}" # путь к установленной библиотеке SFML
       
       # Сборка проекта
       - name: Build project
@@ -34,19 +34,14 @@ jobs:
       - name: List files after build (windows)
         run: dir
 
-      # Создание пакета (если необходимо)
+      # Создание пакета
       - name: Create package (windows)
         run: cmake --build . --target package
 
-      # Проверка наличия zip-файла перед загрузкой
-      - name: Check for package file (windows)
+      # Создание zip-архива с исполняемым файлом и DLL
+      - name: Create ZIP archive (windows)
         run: |
-          if (Test-Path "./physics-0.0.${{ github.run_number }}-win64.zip") {
-            Write-Host "Package exists."
-          } else {
-            Write-Host "Package does not exist."
-            exit 1
-          }
+          powershell -Command "Compress-Archive -Path './bin/*' -DestinationPath './physics-0.0.${{ github.run_number }}-win64.zip'"
 
       # Создание релиза и загрузка артефактов
       - name: Create Release (windows)
@@ -60,6 +55,7 @@ jobs:
           draft: false
           prerelease: false
 
+      # Загрузка zip-файла как артефакт релиза на GitHub
       - name: Upload Release Asset (windows)
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -77,15 +73,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # Установка SFML на Ubuntu (можно использовать apt-get)
+      # Установка SFML на Ubuntu
       - name: Install SFML on Ubuntu
         run: sudo apt-get install libsfml-dev
       
-      # Настройка CMake для Ubuntu
+      # Настройка CMake
       - name: Configure CMake (ubuntu)
         run: cmake . -DPATCH_VERSION=${{ github.run_number }}
 
-      # Сборка проекта на Ubuntu
+      # Сборка проекта
       - name: Build project (ubuntu)
         run: cmake --build .
 
@@ -93,19 +89,9 @@ jobs:
       - name: List files after build (ubuntu)
         run: ls -la
 
-      # Создание пакета для Ubuntu (если необходимо)
+      # Создание пакета для Ubuntu
       - name: Create package (ubuntu)
         run: cmake --build . --target package
-
-      # Проверка наличия zip-файла перед загрузкой на Ubuntu
-      - name: Check for package file (ubuntu)
-        run: |
-          if [ -f "./physics-0.0.${{ github.run_number }}-Linux.zip" ]; then
-            echo "Package exists."
-          else
-            echo "Package does not exist."
-            exit 1
-          fi
 
       # Создание релиза и загрузка артефактов для Ubuntu
       - name: Create Release (ubuntu)
@@ -119,6 +105,7 @@ jobs:
           draft: false
           prerelease: false 
 
+      # Загрузка zip-файла как артефакт релиза на GitHub для Ubuntu
       - name: Upload Release Asset (ubuntu)
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -126,6 +113,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_ubuntu.outputs.upload_url }}
-          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный.
+          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный 
           asset_name: physics-0.0.${{ github.run_number }}-Linux.zip 
-          asset_content_type: application/zip 
+          asset_content_type: application/zip
