@@ -41,12 +41,12 @@ jobs:
       # Проверка наличия zip-файла перед загрузкой
       - name: Check for package file (windows)
         run: |
-          if exist ./physics-0.0.${{ github.run_number }}-win64.zip (
-            echo Package exists.
-          ) else (
-            echo Package does not exist.
+          if (Test-Path "./physics-0.0.${{ github.run_number }}-win64.zip") {
+            Write-Host "Package exists."
+          } else {
+            Write-Host "Package does not exist."
             exit 1
-          )
+          }
 
       # Создание релиза и загрузка артефактов
       - name: Create Release (windows)
@@ -102,7 +102,7 @@ jobs:
       # Проверка наличия zip-файла перед загрузкой на Ubuntu
       - name: Check for package file (ubuntu)
         run: |
-          if [ -f ./physics-0.0.${{ github.run_number }}-Linux.zip ]; then
+          if [ -f "./physics-0.0.${{ github.run_number }}-Linux.zip" ]; then
             echo "Package exists."
           else
             echo "Package does not exist."
