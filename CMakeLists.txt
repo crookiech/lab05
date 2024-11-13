@@ -37,6 +37,30 @@ add_executable(physics
         black_box/Application.cpp black_box/View.cpp black_box/PainterImpl.cpp)
 target_link_libraries(physics PRIVATE sfml-graphics)
 
+# Укажите директорию, где находятся ваши DLL-файлы
+set(DLL_DIR "${CMAKE_SOURCE_DIR}/sources")
+
+# Список необходимых DLL-файлов
+set(DLL_FILES
+    "${DLL_DIR}/sfml-audio-2.dll"
+    "${DLL_DIR}/sfml-audio-d-2.dll"
+    "${DLL_DIR}/sfml-graphics-2.dll"
+    "${DLL_DIR}/sfml-graphics-d-2.dll"
+    "${DLL_DIR}/sfml-network-2.dll"
+    "${DLL_DIR}/sfml-network-d-2.dll"
+    "${DLL_DIR}/sfml-system-2.dll"
+    "${DLL_DIR}/sfml-system-d-2.dll"
+    "${DLL_DIR}/sfml-window-2.dll"
+    "${DLL_DIR}/sfml-window-d-2.dll"
+)
+
+# Копирование DLL-файлов в выходной каталог после сборки
+foreach(DLL_FILE ${DLL_FILES})
+    add_custom_command(TARGET physics POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${DLL_FILE}" $<TARGET_FILE_DIR:physics>)
+endforeach()
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")    # Флаг для компилятора MSVC (Windows)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
     else()
