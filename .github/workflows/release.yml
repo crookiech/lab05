@@ -34,19 +34,6 @@ jobs:
       - name: List files after build (windows)
         run: dir
 
-      # Копирование необходимых DLL-файлов в выходной каталог
-      - name: Copy DLLs to build directory
-        run: |
-          $DLL_DIR = "sources"  # Папка, где находятся ваши DLL-файлы
-          $dllFiles = Get-ChildItem "$DLL_DIR\*.dll"
-          if ($dllFiles) {
-            Copy-Item "$DLL_DIR\*.dll" ".\" -Force
-            Write-Host "DLL files copied successfully."
-          } else {
-            Write-Host "No DLL files found in $DLL_DIR."
-            exit 1
-          }
-
       # Создание пакета (если необходимо)
       - name: Create package (windows)
         run: cmake --build . --target package
@@ -89,8 +76,6 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
       
       # Установка SFML на Ubuntu (можно использовать apt-get)
       - name: Install SFML on Ubuntu
@@ -141,6 +126,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_ubuntu.outputs.upload_url }}
-          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный
-          asset_name: physics-0.0.${{ github.run_number }}-Linux.zip
+          asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный.
+          asset_name: physics-0.0.${{ github.run_number }}-Linux.zip 
           asset_content_type: application/zip 
