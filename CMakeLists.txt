@@ -6,8 +6,11 @@ project(physics VERSION ${PROJECT_VERSION})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# поиск SFML
 find_package(SFML COMPONENTS graphics)
 
+
+# скачивание SFML
 if (SFML_FOUND)
     message(STATUS "The SFML installed in the system will be used")
 else ()
@@ -23,21 +26,19 @@ else ()
     FetchContent_MakeAvailable(SFML)
 endif ()
 
+# для использования M_PI
 if (MSVC)
     add_definitions(-D_USE_MATH_DEFINES)
 endif ()
 
+# добавление исполняемого файла
 add_executable(physics
         main.cpp World.cpp Ball.cpp Physics.cpp Color.cpp Painter.cpp Dust.cpp
-        black_box/Application.cpp black_box/View.cpp black_box/PainterImpl.cpp)
+        black_box/Application.cpp black_box/View.cpp black_box/PainterImpl.cpp
+        sources/sfml-system-2.dll sources/sfml-graphics-2.dll sources/sfml-window-2.dll)
+
+# связывание с SFML
 target_link_libraries(physics PRIVATE sfml-graphics)
-
-set(SOURCES_DIR "${CMAKE_SOURCE_DIR}/sources")
-set(BUILD_DIR "${CMAKE_BINARY_DIR}/build")
-
-add_custom_command(TARGET physics POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${SOURCES_DIR}" "${BUILD_DIR}")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
@@ -49,7 +50,10 @@ target_compile_options(physics PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/W4>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
+# установка исполняемого файла
 install(TARGETS physics DESTINATION bin)
+
+# настройка CPack
 set(CPACK_GENERATOR "ZIP;DEB")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_NAME "physics")
