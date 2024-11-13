@@ -38,9 +38,10 @@ jobs:
       - name: Create package (windows)
         run: cmake --build . --target package
 
-      # Создание zip-архива с исполняемым файлом и DLL
+      # Удаление существующего zip-архива (если есть) и создание нового
       - name: Create ZIP archive (windows)
         run: |
+          powershell -Command "if (Test-Path './physics-0.0.${{ github.run_number }}-win64.zip') { Remove-Item './physics-0.0.${{ github.run_number }}-win64.zip' }"
           powershell -Command "Compress-Archive -Path './bin/*' -DestinationPath './physics-0.0.${{ github.run_number }}-win64.zip'"
 
       # Создание релиза и загрузка артефактов
@@ -115,4 +116,4 @@ jobs:
           upload_url: ${{ steps.create_release_ubuntu.outputs.upload_url }}
           asset_path: ./physics-0.0.${{ github.run_number }}-Linux.zip  # Убедитесь, что этот путь правильный 
           asset_name: physics-0.0.${{ github.run_number }}-Linux.zip 
-          asset_content_type: application/zip
+          asset_content_type: application/zip 
